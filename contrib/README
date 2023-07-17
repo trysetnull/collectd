@@ -61,6 +61,7 @@ contrib/docker/collectd.conf.d/ directory, and build an image including them:
 Then run it with the required bind-mounts:
  $ docker run -it --rm \
     -v /proc:/rootfs/proc:ro -v /sys:/rootfs/sys:ro \
+    --security-opt systempaths=unconfined \
     --name collectd my_collectd
  $ docker exec -it collectd collectdctl listval
 

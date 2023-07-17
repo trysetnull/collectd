@@ -33,7 +33,7 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <errno.h>
-#include <error.h>
+#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -47,11 +47,11 @@ const char *add_prefix(const char *orig, char *prefixed) {
 
   int status = snprintf(prefixed, BUFSIZE, "%s%s", PREFIX, orig);
   if (status < 1) {
-    error(status, errno, "adding '%s' prefix to file path failed: '%s' -> '%s'",
+    err(status, "adding '%s' prefix to file path failed: '%s' -> '%s'",
           PREFIX, orig, prefixed);
     return orig;
   } else if ((unsigned int)status >= BUFSIZE) {
-    error(status, ENAMETOOLONG,
+    err(status,
           "'%s' got truncated when adding '%s' prefix: '%s'", orig, PREFIX,
           prefixed);
     return orig;

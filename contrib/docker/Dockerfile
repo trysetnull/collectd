@@ -1,23 +1,27 @@
-FROM debian:stable-slim
-
-ENV DEBIAN_FRONTEND noninteractive
-COPY 50docker-apt-conf /etc/apt/apt.conf.d/
+# Builder stage
+FROM alpine AS builder
 
 COPY rootfs_prefix/ /usr/src/rootfs_prefix/
 
-RUN apt-get update \
- && apt-get upgrade \
- && apt-get install \
-    collectd-core \
-    collectd-utils \
-    build-essential \
- && make -C /usr/src/rootfs_prefix/ \
- && apt-get --purge remove build-essential \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+RUN apk update \
+ && apk add --virtual build-dependencies \
+    build-base \
+    gcc \
+    musl-dev \
+ && make -C /usr/src/rootfs_prefix/
 
+# Production stage
+FROM alpine AS production
+
+COPY --from=builder /usr/src/rootfs_prefix/rootfs_prefix.so /usr/src/rootfs_prefix/rootfs_prefix.so
 COPY collectd.conf /etc/collectd/collectd.conf
-COPY collectd.conf.d /etc/collectd/collectd.conf.d
+COPY collectd.conf.d/ /etc/collectd/collectd.conf.d/
+
+RUN apk update \
+ && apk add --no-cache \
+    collectd \
+    collectd-disk \
+    collectd-utils
 
 ENV LD_PRELOAD /usr/src/rootfs_prefix/rootfs_prefix.so
 
