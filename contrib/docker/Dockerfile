@@ -16,12 +16,11 @@ FROM alpine AS production
 COPY --from=builder /usr/src/rootfs_prefix/rootfs_prefix.so /usr/src/rootfs_prefix/rootfs_prefix.so
 COPY collectd.conf /etc/collectd/collectd.conf
 COPY collectd.conf.d/ /etc/collectd/collectd.conf.d/
+COPY collectd_csv_plot.gnu /var/lib/collectd/csv/collectd_csv_plot.gnu
 
 RUN apk update \
  && apk add --no-cache \
-    collectd \
-    collectd-disk \
-    collectd-utils
+    collectd
 
 ENV LD_PRELOAD /usr/src/rootfs_prefix/rootfs_prefix.so
 
